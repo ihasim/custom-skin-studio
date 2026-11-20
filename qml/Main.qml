@@ -14,10 +14,11 @@ ApplicationWindow {
 
     property string mode: "colors"
     property int expandVoice: -1
+    function testPickLoadscreen(file) { editor.testPickLoadscreen(file) }
     function openCrop(url) { mode = "loadscreen"; crop.openWith(url) }
 
     StartScreen { anchors.fill: parent; visible: AppController.screen !== "editor" }
-    Editor { id: editor; anchors.fill: parent; visible: AppController.screen === "editor"; mode: win.mode; overlayOpen: crop.visible; onModeRequested: (m) => win.mode = m }
+    Editor { id: editor; anchors.fill: parent; visible: AppController.screen === "editor"; mode: win.mode; overlayOpen: crop.visible; onModeRequested: (m) => win.mode = m; onCropRequested: (f) => win.openCrop(f) }
 
     CropDialog { id: crop; anchors.fill: parent }
 

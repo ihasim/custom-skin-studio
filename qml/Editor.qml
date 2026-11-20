@@ -10,6 +10,8 @@ Rectangle {
     property string mode: "colors"
     property bool overlayOpen: false
     signal modeRequested(string m)
+    signal cropRequested(url file)
+    function testPickLoadscreen(file) { if (panelLoader.item && panelLoader.item.simulatePick) panelLoader.item.simulatePick(file) }
 
     FileDialog {
         id: saveDlg
@@ -98,13 +100,14 @@ Rectangle {
         color: Theme.panel
         Rectangle { anchors.left: parent.left; width: 1; height: parent.height; color: Theme.line }
         Loader {
+            id: panelLoader
             anchors.fill: parent; anchors.leftMargin: 1
             sourceComponent: ed.mode === "effects" ? effectsC : ed.mode === "voice" ? voiceC : ed.mode === "loadscreen" ? lsC : ed.mode === "package" ? pkgC : colorsC
         }
         Component { id: colorsC; ColorsPanel {} }
         Component { id: effectsC; EffectsPanel {} }
         Component { id: voiceC; VoicePanel {} }
-        Component { id: lsC; LoadscreenPanel { onSaveRequested: saveDlg.open() } }
+        Component { id: lsC; LoadscreenPanel { onSaveRequested: saveDlg.open(); onCropRequested: (f) => ed.cropRequested(f) } }
         Component { id: pkgC; PackagePanel { onSaveRequested: saveDlg.open() } }
     }
 

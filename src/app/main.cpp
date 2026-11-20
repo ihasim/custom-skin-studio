@@ -52,6 +52,8 @@ static void runEvents(QQuickWindow *win, QStringList steps, std::function<void()
     } else if (kind == "shot") {
         win->grabWindow().save(step.section(':', 1));
         std::printf("shot %s\n", qPrintable(step.section(':', 1)));
+    } else if (kind == "pickls") {
+        QMetaObject::invokeMethod(win, "testPickLoadscreen", Q_ARG(QVariant, QUrl::fromLocalFile(QDir(step.section(':', 1)).absolutePath())));
     } else if (kind == "call") {
         QMetaObject::invokeMethod(win, qPrintable(step.section(':', 1)));
     }

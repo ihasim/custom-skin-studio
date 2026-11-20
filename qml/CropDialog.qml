@@ -16,7 +16,7 @@ Rectangle {
     function openWith(url) {
         source = url
         imgSize = AppController.imageSize(url)
-        if (imgSize.width <= 0) { AppController.clearError(); return }
+        if (imgSize.width <= 0) return
         // largest centered rect with the right aspect
         var ia = imgSize.width / imgSize.height
         if (ia > aspect) { ch = 1; cw = aspect / ia } else { cw = 1; ch = ia / aspect }

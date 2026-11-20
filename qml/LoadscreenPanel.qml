@@ -7,11 +7,14 @@ import SkinStudio
 Item {
     id: lp
     signal saveRequested()
+    signal cropRequested(url file)
+    // test hook: behaves exactly like choosing a file in the dialog
+    function simulatePick(file) { imgDlg.selectedFile = file; imgDlg.accepted() }
     FileDialog {
         id: imgDlg
         title: "Yükleme ekranı görseli seç"
         nameFilters: ["Görseller (*.png *.jpg *.jpeg *.webp *.bmp)", "Tüm dosyalar (*)"]
-        onAccepted: Window.window.openCrop(selectedFile)
+        onAccepted: lp.cropRequested(selectedFile)
     }
     ColumnLayout {
         anchors.fill: parent; anchors.margins: 18
@@ -25,7 +28,7 @@ Item {
         Rectangle {
             Layout.fillWidth: true; Layout.fillHeight: true
             radius: 14; color: Theme.bg2; border.color: Theme.line
-            DropArea { anchors.fill: parent; onDropped: (d) => { if (d.hasUrls) Window.window.openCrop(d.urls[0]) } }
+            DropArea { anchors.fill: parent; onDropped: (d) => { if (d.hasUrls) lp.cropRequested(d.urls[0]) } }
             Image {
                 id: cur
                 anchors.centerIn: parent

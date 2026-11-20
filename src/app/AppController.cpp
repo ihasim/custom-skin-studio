@@ -3,6 +3,8 @@
 #include <QColor>
 #include <QDir>
 #include <QFileInfo>
+#include <QImageReader>
+#include <QDebug>
 #include <QJSEngine>
 #include <QQmlEngine>
 #include <QSettings>
@@ -481,6 +483,15 @@ void AppController::resetEffects() {
     edited();
 }
 
+static QImage loadImageFile(const QUrl &url) {
+    QImageReader r(url.isLocalFile() ? url.toLocalFile() : url.toString());
+    r.setAutoTransform(true);           // phone photos: honour EXIF rotation
+    r.setAllocationLimit(1024);         // MB; big camera images are fine
+    QImage img = r.read();
+    if (img.isNull()) qWarning() << "image load failed:" << r.fileName() << r.errorString();
+    return img;
+}
+
 static int findAnim(const SkinProject &p, const QStringList &prefixes) {
     for (const QString &pre : prefixes)
         for (int i = 0; i < int(p.animations.size()); ++i)
@@ -669,11 +680,14 @@ QVariantList AppController::sourcePeaks(int line, int buckets) const {
 // ------------------------------------------------------------------ loading screen / cover
 
 QSize AppController::imageSize(const QUrl &url) const {
-    QImage img(url.toLocalFile());
+    QImage img = loadImageFile(url);
     if (!img.isNull()) {
         const_cast<AppController *>(this)->loadscreenSource_ = img.convertToFormat(QImage::Format_RGBA8888);
         const_cast<AppController *>(this)->revision_++;
         emit const_cast<AppController *>(this)->imagesChanged();
+    } else {
+        const_cast<AppController *>(this)->setError("Görsel açılamadı: " + QFileInfo(url.toLocalFile()).fileName() +
+                                                   " (desteklenen: PNG, JPEG, WebP, BMP)");
     }
     return img.size();
 }
@@ -681,7 +695,7 @@ QSize AppController::imageSize(const QUrl &url) const {
 bool AppController::setLoadscreen(const QUrl &url, double x, double y, double w, double h) {
     if (!project_) return false;
     QImage src = loadscreenSource_;
-    if (src.isNull() || !url.isEmpty()) src = QImage(url.toLocalFile());
+    if (src.isNull() || !url.isEmpty()) src = loadImageFile(url);
     if (src.isNull()) { setError("Görsel açılamadı."); return false; }
     const QRect r(int(std::lround(x * src.width())), int(std::lround(y * src.height())),
                   std::max(1, int(std::lround(w * src.width()))), std::max(1, int(std::lround(h * src.height()))));
@@ -714,7 +728,7 @@ void AppController::coverFromLoadscreen() {
 
 bool AppController::setCover(const QUrl &url) {
     if (!project_) return false;
-    QImage img(url.toLocalFile());
+    QImage img = loadImageFile(url);
     if (img.isNull()) { setError("Görsel açılamadı."); return false; }
     project_->coverChanged = true;
     project_->cover = img.width() > 1024 ? img.scaledToWidth(1024, Qt::SmoothTransformation) : img;
