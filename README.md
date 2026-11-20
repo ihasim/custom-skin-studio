@@ -20,7 +20,7 @@ Kurulum yapmak istemezsen `...-windows-portable.zip` dosyasını indir, bir klas
 
 > Windows SmartScreen "tanınmayan uygulama" uyarısı gösterebilir, çünkü uygulama imzalı değil. **Ek bilgi → Yine de çalıştır** ile açabilirsin.
 
-**macOS** (Apple Silicon ve Intel, macOS 12 ve üstü):
+**macOS** (Apple Silicon, M1 ve sonrası; macOS 12 ve üstü):
 1. `CustomSkinStudio-x.y.z-macos.dmg` dosyasını indir.
 2. Uygulamayı **Applications** klasörüne sürükle.
 3. İlk açılışta uygulamaya **sağ tıkla → Aç** de. Uygulama Apple tarafından imzalanmadığı için bu adım gerekiyor.
