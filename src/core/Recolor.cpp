@@ -223,7 +223,7 @@ QImage applyRegions(const QImage &original, const RegionMap &map, const std::vec
             else if (a2.isIdentity()) std::memcpy(c2, in + x * 4, 4); else adjustPixel(in + x * 4, c2, a2, map.regions[l2]);
             float w = map.mix[i] / 255.0f;
             float hl = 0;
-            if (highlight >= 0) hl = 0.6f * ((l1 == highlight ? w : 0) + (l2 == highlight && l2 != l1 ? 1 - w : 0));
+            if (highlight >= 0) hl = 0.55f * ((l1 == highlight ? w : 0) + (l2 == highlight && l2 != l1 ? 1 - w : 0));
             static const float accent[3] = {45, 212, 191};
             for (int k = 0; k < 3; ++k) {
                 float v = c1[k] * w + c2[k] * (1 - w);

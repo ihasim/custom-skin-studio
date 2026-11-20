@@ -17,7 +17,7 @@ ApplicationWindow {
     function openCrop(url) { mode = "loadscreen"; crop.openWith(url) }
 
     StartScreen { anchors.fill: parent; visible: AppController.screen !== "editor" }
-    Editor { id: editor; anchors.fill: parent; visible: AppController.screen === "editor"; mode: win.mode; onModeRequested: (m) => win.mode = m }
+    Editor { id: editor; anchors.fill: parent; visible: AppController.screen === "editor"; mode: win.mode; overlayOpen: crop.visible; onModeRequested: (m) => win.mode = m }
 
     CropDialog { id: crop; anchors.fill: parent }
 
@@ -25,7 +25,8 @@ ApplicationWindow {
     DropArea {
         anchors.fill: parent
         enabled: AppController.screen === "editor"
-        keys: ["text/uri-list"]
+        // only take .fantome files; anything else falls through to the panel underneath
+        onEntered: (drag) => { drag.accepted = drag.hasUrls && drag.urls.length > 0 && drag.urls[0].toString().toLowerCase().endsWith(".fantome") }
         onDropped: (drop) => {
             if (drop.hasUrls && drop.urls[0].toString().toLowerCase().endsWith(".fantome")) {
                 if (AppController.dirty) { pendingOpen.url = drop.urls[0]; pendingOpen.open() }

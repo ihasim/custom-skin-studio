@@ -45,6 +45,13 @@ AppController::AppController(QObject *parent) : QObject(parent) {
         for (int i = 0; i < int(partStale_.size()); ++i)
             if (partStale_[size_t(i)]) rebuildPartTexture(i);
     });
+    flashTimer_.setSingleShot(true);
+    flashTimer_.setInterval(900);
+    connect(&flashTimer_, &QTimer::timeout, this, [this] {
+        flash_ = false;
+        emit partTextureChanged(selPart_);
+        ++revision_; emit imagesChanged();
+    });
     connect(&loadWatch_, &QFutureWatcher<QString>::finished, this, &AppController::finishLoad);
     connect(&audio_, &AudioEngine::finished, this, [this] { playLine_ = -1; emit playingLineChanged(); });
     connect(&audio_, &AudioEngine::progressChanged, this, &AppController::playProgressChanged);
@@ -243,6 +250,8 @@ void AppController::setSelectedPart(int p) {
 void AppController::setSelectedRegion(int r) {
     if (r == selRegion_) return;
     selRegion_ = r;
+    flash_ = r >= 0;
+    if (flash_) flashTimer_.start();
     emit selectionChanged();
     emit partTextureChanged(selPart_);
     ++revision_; emit imagesChanged();
@@ -250,6 +259,8 @@ void AppController::setSelectedRegion(int r) {
 
 void AppController::touchPart(int part) {
     partStale_[size_t(part)] = true;
+    flash_ = false;
+    flashTimer_.stop();
     textureTimer_.start();
     edited();
 }
@@ -285,7 +296,7 @@ void AppController::setRegionColor(int part, int region, const QColor &c) {
     RegionAdjust &a = p.adjust[size_t(region)];
     a.hue = std::fmod(h1 - h0 + 540.0f, 360.0f) - 180.0f;
     a.sat = std::clamp(s1 / std::max(s0, 0.04f), 0.0f, 4.0f);
-    a.val = std::clamp(v1 / std::max(v0, 0.03f), 0.0f, 6.0f);
+    a.val = std::clamp(v1 / std::max(v0, 0.03f), 0.0f, 2.5f);
     touchPart(part);
 }
 
@@ -319,7 +330,7 @@ QImage AppController::image(const QString &id) {
     if (id.startsWith("part/")) {
         int i = id.mid(5).section('/', 0, 0).toInt();
         if (i < 0 || i >= int(partImages_.size())) return {};
-        if (i == selPart_ && selRegion_ >= 0)
+        if (i == selPart_ && selRegion_ >= 0 && flash_)
             return applyRegions(project_->parts[size_t(i)].original, project_->parts[size_t(i)].regions,
                                 project_->parts[size_t(i)].adjust, selRegion_);
         return partImages_[size_t(i)];

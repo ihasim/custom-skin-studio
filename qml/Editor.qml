@@ -8,6 +8,7 @@ Rectangle {
     id: ed
     color: Theme.bg
     property string mode: "colors"
+    property bool overlayOpen: false
     signal modeRequested(string m)
 
     FileDialog {
@@ -110,7 +111,7 @@ Rectangle {
     // ---------------- stage
     Item {
         anchors.top: top.bottom; anchors.bottom: parent.bottom; anchors.left: rail.right; anchors.right: panel.left
-        Viewport { id: vp; anchors.fill: parent; anchors.bottomMargin: tl.height; pickEnabled: ed.mode === "colors" }
+        Viewport { id: vp; anchors.fill: parent; anchors.bottomMargin: tl.height; pickEnabled: ed.mode === "colors"; inputEnabled: !ed.overlayOpen }
         Timeline { id: tl; anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom }
         Rectangle {
             visible: !AppController.gameFound

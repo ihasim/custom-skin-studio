@@ -207,6 +207,8 @@ private:
     std::vector<QImage> partImages_;   // current (edited) textures, without highlight
     std::vector<bool> partStale_;
     QTimer textureTimer_;
+    QTimer flashTimer_;
+    bool flash_ = false;   // selected region is tinted briefly so the user sees where it is
 
     // animation
     int anim_ = -1;
