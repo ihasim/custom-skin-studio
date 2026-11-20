@@ -1,0 +1,6 @@
+build*/
+dist/
+.qt/
+.DS_Store
+*.user
+smoke.png
